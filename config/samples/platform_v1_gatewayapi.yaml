@@ -1,0 +1,9 @@
+apiVersion: platform.mac.com/v1
+kind: GatewayAPI
+metadata:
+  labels:
+    app.kubernetes.io/name: runlocalk8smac
+    app.kubernetes.io/managed-by: kustomize
+  name: gatewayapi-sample
+spec:
+  # TODO(user): Add fields here

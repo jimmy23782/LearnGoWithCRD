@@ -1,0 +1,12 @@
+apiVersion: platform.mac.com/v1
+kind: GatewayAPI
+metadata:
+  name: payments-api
+spec:
+  teamName: payments
+  apiName: payments-api
+  environment: dev
+  backend:
+    url: https://payments.example.com
+  authentication:
+    type: oidc

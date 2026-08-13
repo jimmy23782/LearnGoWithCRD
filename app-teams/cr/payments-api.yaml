@@ -1,0 +1,13 @@
+apiVersion: platform.mac.com/v1
+kind: GatewayAPI
+metadata:
+  name: payments-api
+  namespace: default
+spec:
+  teamName: payments
+  environment: dev
+  apiName: payments-api
+  backend:
+    url: https://payments.example.com
+  authentication:
+    type: jwt
