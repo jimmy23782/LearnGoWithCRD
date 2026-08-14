@@ -22,7 +22,7 @@ resources:
 # default, aiding admins in cluster management. Those roles are
 # not used by the runlocalk8smac itself. You can comment the following lines
 # if you do not want those helpers be installed with your Project.
-- gatewayapi_admin_role.yaml
-- gatewayapi_editor_role.yaml
-- gatewayapi_viewer_role.yaml
+- tenant_admin_role.yaml
+- tenant_editor_role.yaml
+- tenant_viewer_role.yaml
 

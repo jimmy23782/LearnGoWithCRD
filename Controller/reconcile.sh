@@ -3,21 +3,21 @@
 CR_NAME="payments-api"
 NAMESPACE="default"
 
-echo "Starting simple GatewayAPI controller..."
+echo "Starting simple Tenant controller..."
 
 while true
 do
-  echo "Reconciling GatewayAPI: $CR_NAME"
+  echo "Reconciling Tenant: $CR_NAME"
 
-  TEAM_NAME=$(kubectl get gapi "$CR_NAME" \
+  TEAM_NAME=$(kubectl get tenants "$CR_NAME" \
     -n "$NAMESPACE" \
     -o jsonpath='{.spec.teamName}')
 
-  API_NAME=$(kubectl get gapi "$CR_NAME" \
+  API_NAME=$(kubectl get tenants "$CR_NAME" \
     -n "$NAMESPACE" \
     -o jsonpath='{.spec.apiName}')
 
-  AUTH_TYPE=$(kubectl get gapi "$CR_NAME" \
+  AUTH_TYPE=$(kubectl get tenants "$CR_NAME" \
     -n "$NAMESPACE" \
     -o jsonpath='{.spec.authentication.type}')
 

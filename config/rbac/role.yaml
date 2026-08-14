@@ -7,7 +7,18 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - configmaps
+  - namespaces
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - platform.mac.com
+  resources:
+  - tenants
   verbs:
   - create
   - delete
@@ -19,25 +30,13 @@ rules:
 - apiGroups:
   - platform.mac.com
   resources:
-  - gatewayapis
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - platform.mac.com
-  resources:
-  - gatewayapis/finalizers
+  - tenants/finalizers
   verbs:
   - update
 - apiGroups:
   - platform.mac.com
   resources:
-  - gatewayapis/status
+  - tenants/status
   verbs:
   - get
   - patch

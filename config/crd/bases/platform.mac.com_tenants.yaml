@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.21.0
-  name: gatewayapis.platform.mac.com
+  name: tenants.platform.mac.com
 spec:
   group: platform.mac.com
   names:
-    kind: GatewayAPI
-    listKind: GatewayAPIList
-    plural: gatewayapis
-    singular: gatewayapi
-  scope: Namespaced
+    kind: Tenant
+    listKind: TenantList
+    plural: tenants
+    singular: tenant
+  scope: Cluster
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: GatewayAPI is the Schema for the gatewayapis API
+        description: Tenant is the Schema for the tenants API.
         properties:
           apiVersion:
             description: |-
@@ -37,73 +37,40 @@ spec:
           metadata:
             type: object
           spec:
-            description: spec defines the desired state of GatewayAPI
+            description: Desired state.
             properties:
-              apiName:
-                description: Name of the API being exposed
+              cmdbTeamId:
+                description: Unique team identifier from the CMDB.
+                minLength: 1
                 type: string
-              authentication:
-                description: Authentication configuration
-                properties:
-                  type:
-                    description: Authentication type
-                    enum:
-                    - oidc
-                    - jwt
-                    - basic
-                    - none
-                    type: string
-                required:
-                - type
-                type: object
-              backend:
-                description: Backend configuration
-                properties:
-                  url:
-                    description: Backend URL
-                    type: string
-                required:
-                - url
-                type: object
-              routes:
-                description: Optional list of routes
+              environment:
+                description: Target environment.
+                enum:
+                - dev
+                - uat
+                - prod
+                type: string
+              owners:
+                description: Team owners responsible for this tenant.
                 items:
-                  properties:
-                    methods:
-                      description: Optional HTTP methods
-                      items:
-                        type: string
-                      type: array
-                    path:
-                      description: Route path
-                      type: string
-                  required:
-                  - path
-                  type: object
+                  type: string
+                minItems: 1
                 type: array
               teamName:
-                description: Name of the tenant team requesting the gateway
+                description: Human-readable name of the tenant team.
+                minLength: 1
                 type: string
             required:
-            - apiName
-            - authentication
-            - backend
+            - cmdbTeamId
+            - environment
+            - owners
             - teamName
             type: object
           status:
-            description: status defines the observed state of GatewayAPI
+            description: Current observed state.
             properties:
               conditions:
-                description: |-
-                  conditions represent the current state of the GatewayAPI resource.
-                  Each condition has a unique type and reflects the status of a specific aspect of the resource.
-
-                  Standard condition types include:
-                  - "Available": the resource is fully functional
-                  - "Progressing": the resource is being created or updated
-                  - "Degraded": the resource failed to reach or maintain its desired state
-
-                  The status of each condition is one of True, False, or Unknown.
+                description: Current reconciliation status.
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.

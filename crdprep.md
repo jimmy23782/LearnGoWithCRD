@@ -15,7 +15,7 @@ Payments API               Customer API              Legacy API
 ## Sample Example CR expected from feature team
 
 apiVersion: platform.mac.com/v1
-kind: GatewayAPI
+kind: Tenant
 metadata:
   name: payments-api
 spec:
@@ -34,14 +34,14 @@ Developer
    │
    │ kubectl apply
    ▼
-GatewayAPI CR
+Tenant CR
    │
    ▼
 Kubernetes API Server
    │
    │ validates against
    ▼
-GatewayAPI CRD
+Tenant CRD
    │
    ├── Invalid → REJECT
    │
