@@ -1,12 +1,11 @@
 apiVersion: platform.mac.com/v1
 kind: Tenant
 metadata:
-  name: payments-api
+  name: payments
+
 spec:
-  teamName: payments
-  apiName: payments-api
+  teamName: Payments
+  cmdbTeamId: PAY001
+  owners:
+    - jimmy.joy@company.com
   environment: dev
-  backend:
-    url: https://payments.example.com
-  authentication:
-    type: oidc
