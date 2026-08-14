@@ -1,135 +1,248 @@
-# runlocalk8smac
-// TODO(user): Add simple overview of use/purpose
+# Gateway Operator
 
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+A Kubernetes Operator built using **Kubebuilder** and **Go** to provide a self-service onboarding platform for application teams.
 
-## Getting Started
+The long-term vision of this project is to enable engineering teams to onboard themselves onto a Kubernetes platform by submitting simple Custom Resources (CRs), while the platform automatically provisions and manages the underlying Kubernetes and Gloo Gateway resources.
 
-### Prerequisites
-- go version v1.24.6+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
+---
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+# Problem Statement
 
-```sh
-make docker-build docker-push IMG=<some-registry>/runlocalk8smac:tag
+In many organisations, every application team implements Kubernetes onboarding and API gateway configuration differently.
+
+This project demonstrates how a Platform Engineering team can expose a simple self-service API while hiding Kubernetes and Gloo Gateway complexity from feature teams.
+
+Instead of asking teams to manually create Kubernetes resources, they simply submit a Tenant resource.
+
+The platform provisions everything required.
+
+---
+
+# Current Version
+
+**Version 1.0**
+
+Implemented features:
+
+- Custom Kubernetes API using Kubebuilder
+- Cluster-scoped Tenant CRD
+- Validation using OpenAPI schema
+- Namespace reconciliation
+- Idempotent reconciliation
+- Unit tests
+
+Current workflow:
+
+```
+Feature Team
+
+        │
+
+Submit Tenant YAML
+
+        │
+
+Kubernetes API Server
+
+        │
+
+Tenant Controller
+
+        │
+
+Creates Namespace
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified.
-And it is required to have access to pull the image from the working environment.
-Make sure you have the proper permission to the registry if the above commands don’t work.
+Example:
 
-**Install the CRDs into the cluster:**
+```yaml
+apiVersion: platform.mac.com/v1
+kind: Tenant
 
-```sh
+metadata:
+  name: payments
+
+spec:
+  teamName: Payments
+  cmdbTeamId: PAY001
+  owners:
+    - jimmy.joy@company.com
+  environment: dev
+```
+
+Creates
+
+```
+payments-dev
+```
+
+---
+
+# Roadmap
+
+## Version 1.0
+
+- [x] Tenant CRD
+- [x] Namespace reconciliation
+
+## Version 1.1
+
+- [ ] Default RBAC
+- [ ] ResourceQuota
+- [ ] NetworkPolicy
+
+## Version 1.2
+
+- [ ] Helm packaging
+- [ ] Argo CD deployment
+
+## Version 2.0
+
+- [ ] PlatformAPI CRD
+- [ ] Gloo Gateway integration
+- [ ] Authentication Policies
+- [ ] HTTPRoute reconciliation
+
+---
+
+# Repository Structure
+
+```
+api/
+    Kubernetes API definitions
+
+internal/controller/
+    Reconciliation logic
+
+config/
+    Generated Kubernetes manifests
+
+app-teams/
+    Sample Tenant resources used by feature teams
+
+docs/
+    Architecture and design documents
+```
+
+---
+
+# Running Locally
+
+## Prerequisites
+
+- Go 1.24+
+- Docker Desktop
+- Kind
+- kubectl
+- Kubebuilder
+
+---
+
+## Install the CRD
+
+```bash
 make install
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+---
 
-```sh
-make deploy IMG=<some-registry>/runlocalk8smac:tag
+## Run the controller
+
+```bash
+make run
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
+---
 
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+## Create a Tenant
 
-```sh
-kubectl apply -k config/samples/
+```bash
+kubectl apply -f app-teams/cr/payments.yaml
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+---
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
+## Verify
 
-```sh
-kubectl delete -k config/samples/
+```bash
+kubectl get tenants
+
+kubectl get namespaces
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
+Expected namespace:
 
-```sh
-make uninstall
+```
+payments-dev
 ```
 
-**UnDeploy the controller from the cluster:**
+---
 
-```sh
-make undeploy
+# Learning Goals
+
+This repository demonstrates the complete lifecycle of building a Kubernetes Operator:
+
+1. Define Kubernetes APIs using Go structs.
+2. Generate CRDs using Kubebuilder.
+3. Install CRDs into a Kubernetes cluster.
+4. Implement reconciliation logic.
+5. Validate Custom Resources.
+6. Build a self-service Platform Engineering workflow.
+
+---
+
+# Future Architecture
+
+```
+Tenant
+
+        │
+
+        ▼
+
+Namespace
+
+        │
+
+        ▼
+
+RBAC
+
+        │
+
+        ▼
+
+ResourceQuota
+
+        │
+
+        ▼
+
+NetworkPolicy
+
+        │
+
+        ▼
+
+PlatformAPI
+
+        │
+
+        ▼
+
+Gloo Gateway
+
+        │
+
+        ▼
+
+HTTPRoute
+AuthenticationPolicy
+RateLimitPolicy
 ```
 
-## Project Distribution
+---
 
-Following the options to release and provide this solution to the users.
+# License
 
-### By providing a bundle with all YAML files
-
-1. Build the installer for the image built and published in the registry:
-
-```sh
-make build-installer IMG=<some-registry>/runlocalk8smac:tag
-```
-
-**NOTE:** The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without its
-dependencies.
-
-2. Using the installer
-
-Users can just run 'kubectl apply -f <URL for YAML BUNDLE>' to install
-the project, i.e.:
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/<org>/runlocalk8smac/<tag or branch>/dist/install.yaml
-```
-
-### By providing a Helm Chart
-
-1. Build the chart using the optional helm plugin
-
-```sh
-kubebuilder edit --plugins=helm/v2-alpha
-```
-
-2. See that a chart was generated under 'dist/chart', and users
-can obtain this solution from there.
-
-**NOTE:** If you change the project, you need to update the Helm Chart
-using the same command above to sync the latest changes. Furthermore,
-if you create webhooks, you need to use the above command with
-the '--force' flag and manually ensure that any custom configuration
-previously added to 'dist/chart/values.yaml' or 'dist/chart/manager/manager.yaml'
-is manually re-applied afterwards.
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2026.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Licensed under the Apache License 2.0.
